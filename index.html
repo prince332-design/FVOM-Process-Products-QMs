@@ -21,10 +21,32 @@
         }
         body {
             font-family: 'Inter', sans-serif;
-            background: #f1f5f9;
+            background: radial-gradient(circle at top, #eef2ff 0%, #f8fafc 30%, #f1f5f9 100%);
+            color: #0f172a;
         }
         .font-mono-code {
             font-family: 'Fira Code', monospace;
+        }
+        .certificate-card {
+            background: #ffffff;
+            border: 3px solid rgba(99, 102, 241, 0.42);
+            box-shadow: none;
+        }
+        .certificate-logo-panel {
+            background: transparent;
+            border: 1px solid rgba(59, 130, 246, 0.18);
+            border-radius: 1.75rem;
+            padding: 1.5rem;
+        }
+        .certificate-highlight-card {
+            background: #ffffff;
+            border: 1px solid rgba(99, 102, 241, 0.16);
+        }
+        #printableCertificate .grid,
+        #printableCertificate .grid > div,
+        #printableCertificate table tr,
+        #printableCertificate table thead tr {
+            background: transparent !important;
         }
         ::-webkit-scrollbar {
             width: 6px;
@@ -41,12 +63,15 @@
             background: #94a3b8;
         }
         @media print {
+            html, body {
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                background: #ffffff !important;
+                color: #000000 !important;
+            }
             .no-print {
                 display: none !important;
-            }
-            body {
-                background-color: #ffffff !important;
-                color: #000000 !important;
             }
             .page-break {
                 page-break-after: always;
@@ -56,19 +81,21 @@
                 page-break-inside: avoid;
                 break-inside: avoid;
             }
-            .pdf-container {
+            .pdf-container,
+            #printableCertificate,
+            .certificate-card {
                 box-shadow: none !important;
-                border: 1px solid #cbd5e1 !important;
-                padding: 0 !important;
-            }
-            .glass-panel {
                 background: #ffffff !important;
-                border: 1px solid #e2e8f0 !important;
-                backdrop-filter: none !important;
+                border: 3px solid rgba(99, 102, 241, 0.42) !important;
+                max-width: 100% !important;
+                width: 100% !important;
+                margin: 0 auto !important;
+                page-break-inside: avoid !important;
             }
-            #printableCertificate {
-                box-shadow: none !important;
-                border: 1px solid #cbd5e1 !important;
+            .certificate-logo-panel {
+                background: transparent !important;
+                border: none !important;
+                padding-bottom: 0 !important;
             }
             .sidebar {
                 display: none !important;
@@ -809,11 +836,7 @@
             <!-- Header Actions: Export & Print on far right -->
             <div class="header-actions flex items-center gap-2">
                 <span id="user-name-display" class="text-sm font-medium text-slate-300 mr-1 hidden sm:inline"></span>
-                <button onclick="exportActiveViewPDF()" class="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-2 rounded-xl text-xs font-semibold transition-all shadow-md shadow-indigo-600/20">
-                    <i data-lucide="file-down" class="w-4 h-4"></i>
-                    <span class="hidden sm:inline">Export</span>
-                </button>
-                <button onclick="window.print()" class="flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-2 rounded-xl text-xs font-semibold transition-all border border-slate-700">
+                <button type="button" onclick="window.print()" class="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-2 rounded-xl text-xs font-semibold transition-all shadow-md shadow-indigo-600/20 border border-transparent">
                     <i data-lucide="printer" class="w-4 h-4"></i>
                     <span class="hidden sm:inline">Print</span>
                 </button>
@@ -1538,69 +1561,66 @@
                 <section id="sec-certificate" class="hidden space-y-6">
                     <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between no-print">
                         <span class="text-xs text-slate-500 font-mono"><i class="fa-solid fa-print text-sky-400 mr-2"></i> Certificate of Analysis</span>
-                        <button onclick="downloadCertificatePDF()" class="px-4 py-2 bg-red-600 hover:bg-red-500 text-white font-bold rounded-xl text-xs flex items-center gap-2 shadow-lg shadow-red-600/20">
-                            <i class="fa-solid fa-file-pdf"></i> Download PDF
-                        </button>
                     </div>
-                    <div id="printableCertificate" class="bg-white text-slate-900 p-8 rounded-2xl shadow-2xl max-w-4xl mx-auto border border-slate-300 font-sans">
-                        <div class="flex items-center justify-between border-b-2 border-slate-900 pb-4 mb-6">
-                            <div class="flex items-center gap-4">
-                                <div class="w-14 h-14 bg-slate-900 text-white rounded-xl flex items-center justify-center font-black text-3xl">F</div>
-                                <div>
-                                    <h2 class="text-xl font-extrabold text-slate-900 uppercase tracking-tight">Fatima Vegetable Oil Mills (Pvt) Ltd</h2>
-                                    <p class="text-xs text-slate-600 font-medium">12-KM, Faisalabad Road, Okara, Punjab, Pakistan</p>
-                                    <p class="text-[10px] text-slate-500 font-mono mt-0.5">FVOM QMS v3.0</p>
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                <span class="text-xs font-bold font-mono bg-slate-100 border border-slate-300 px-3 py-1 rounded-lg text-slate-800 block mb-1">CERTIFICATE OF ANALYSIS</span>
-                                <span class="text-[10px] text-slate-500 font-mono">Issued: <span id="pdf_datetime">--/--/----</span></span>
-                            </div>
+                    <div id="printableCertificate" class="certificate-card text-slate-900 p-6 rounded-[2rem] max-w-4xl mx-auto font-sans border border-indigo-200">
+                        <div class="certificate-logo-panel flex justify-center pb-4 mb-6 border-b border-indigo-200">
+                            <img src="./src/assets/logo.png" class="w-60 h-auto object-contain [image-rendering:_crisp-edges]" style="transform: scale(1.5);" />
                         </div>
-                        <div class="bg-indigo-50/70 border border-indigo-200 rounded-xl p-3 mb-5 text-center">
-                            <span class="text-[10px] text-indigo-600 uppercase font-bold tracking-wider block">Product</span>
-                            <span id="pdf_product_name" class="text-xl font-black text-indigo-900">—</span>
+                        <div class="certificate-highlight-card rounded-[1.25rem] p-4 mb-5 text-center">
+                            <span class="text-xs text-indigo-600 uppercase font-bold tracking-wider block">Product</span>
+                            <span id="pdf_product_name" class="text-3xl font-black text-indigo-900">—</span>
                         </div>
-                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs mb-6 font-mono">
-                            <div><span class="text-[10px] text-slate-500 uppercase block">Batch</span><strong class="text-slate-900" id="pdf_batch">—</strong></div>
-                            <div><span class="text-[10px] text-slate-500 uppercase block">Vehicle</span><strong class="text-slate-900" id="pdf_vehicle">—</strong></div>
-                            <div><span class="text-[10px] text-slate-500 uppercase block">Material</span><strong class="text-slate-900" id="pdf_crude">—</strong></div>
-                            <div><span class="text-[10px] text-slate-500 uppercase block">Net Qty</span><strong class="text-slate-900" id="pdf_weight">—</strong></div>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-50 p-4 rounded-[1.25rem] text-xs mb-6 font-mono border border-indigo-100">
+                            <div><span class="text-xs text-slate-500 uppercase block">Batch</span><strong class="text-slate-900" id="pdf_batch">—</strong></div>
+                            <div><span class="text-xs text-slate-500 uppercase block">Vehicle</span><strong class="text-slate-900" id="pdf_vehicle">—</strong></div>
+                            <div><span class="text-xs text-slate-500 uppercase block">Material</span><strong class="text-slate-900" id="pdf_crude">—</strong></div>
+                            <div><span class="text-xs text-slate-500 uppercase block">Net Qty</span><strong class="text-slate-900" id="pdf_weight">—</strong></div>
                         </div>
-                        <div class="mb-6">
-                            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-800 mb-2 border-b border-slate-300 pb-1">Analytical Breakdown</h3>
+                        <div class="mb-5">
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-800 mb-2 pb-1">Analytical Breakdown</h3>
                             <table class="w-full text-left text-xs border-collapse">
                                 <thead>
-                                    <tr class="bg-slate-100 border-b border-slate-300 text-slate-700 font-mono">
-                                        <th class="p-2">Stage</th>
-                                        <th class="p-2">Operation</th>
-                                        <th class="p-2">Verdict</th>
+                                    <tr class="bg-slate-100 text-slate-700 font-mono">
+                                        <th class="p-1">Stage</th>
+                                        <th class="p-1">Operation</th>
+                                        <th class="p-1">Verdict</th>
                                     </tr>
                                 </thead>
-                                <tbody id="pdfTableBody" class="divide-y divide-slate-200 font-mono text-[11px]"></tbody>
+                                <tbody id="pdfTableBody" class="divide-y divide-slate-200 font-mono text-xs"></tbody>
                             </table>
                         </div>
-                        <div class="border-t-2 border-slate-900 pt-4 mt-6 flex flex-wrap justify-between items-end gap-4">
+                        <div class="pt-4 mt-4 flex flex-wrap justify-start items-start gap-3">
                             <div class="space-y-1">
-                                <div class="text-xs font-bold text-slate-800 uppercase">QA Final Clearance:</div>
-                                <div class="text-xs font-mono font-bold text-emerald-700 bg-emerald-50 border border-emerald-300 px-3 py-1.5 rounded-lg inline-block" id="pdfVerdictBox">✓ RELEASED</div>
+                                <div class="text-sm font-bold text-slate-800 uppercase">QA Final Clearance:</div>
+                                <div class="text-sm font-mono font-bold text-emerald-700 bg-emerald-50 border border-emerald-300 px-3 py-1.5 rounded-full inline-block" id="pdfVerdictBox">✓ RELEASED</div>
                             </div>
-                            <div class="flex flex-wrap gap-6 text-center font-mono">
+                            <div class="flex flex-wrap gap-6 text-left font-mono">
                                 <div>
                                     <div class="w-32 border-b border-slate-400 mb-1"></div>
-                                    <div class="text-xs font-bold text-slate-900" id="pdf_analyst">Ali Raza</div>
-                                    <div class="text-[10px] text-slate-500">QA Lead Analyst</div>
+                                    <div class="text-sm font-bold text-slate-900" id="pdf_analyst">Ali Raza</div>
+                                    <div class="text-xs text-slate-500">QA Lead Analyst</div>
                                 </div>
                                 <div>
                                     <div class="w-32 border-b border-slate-400 mb-1"></div>
-                                    <div class="text-xs font-bold text-slate-900" id="pdf_prod_manager">Ahmed Hassan</div>
-                                    <div class="text-[10px] text-slate-500">Production Manager</div>
+                                    <div class="text-sm font-bold text-slate-900" id="pdf_prod_manager">Ahmed Hassan</div>
+                                    <div class="text-xs text-slate-500">Production Manager</div>
                                 </div>
                                 <div>
                                     <div class="w-32 border-b border-slate-400 mb-1"></div>
-                                    <div class="text-xs font-bold text-slate-900" id="pdf_quality_manager">Muhammad Imran</div>
-                                    <div class="text-[10px] text-slate-500">Quality Manager</div>
+                                    <div class="text-sm font-bold text-slate-900" id="pdf_quality_manager">Muhammad Imran</div>
+                                    <div class="text-xs text-slate-500">Quality Manager</div>
                                 </div>
+                            </div>
+                        </div>
+                        <div class="mt-3 flex flex-col gap-1 text-xs sm:flex-row sm:items-start sm:justify-between">
+                            <div class="text-slate-600 font-medium text-sm leading-tight">
+                                Fatima Vegetable Oil Mills (Pvt) Ltd<br>
+                                12-KM, Faisalabad Road, Okara, Punjab, Pakistan
+                            </div>
+                            <div class="text-left text-slate-500 font-mono">
+                                <div class="font-semibold">Issued:</div>
+                                <div><span id="pdf_date">--/--/----</span></div>
+                                <div><span id="pdf_time">--:--:-- PM</span></div>
                             </div>
                         </div>
                     </div>
@@ -1776,6 +1796,66 @@
 
         let auditLog = [];
         let releasedBatches = new Set();
+        const APP_STORAGE_KEY = 'fvom_qms_app_state_v1';
+        const HISTORY_STORAGE_KEYS = {
+            auditLog: 'fvom_qms_audit_log',
+            releasedBatches: 'fvom_qms_released_batches'
+        };
+
+        function saveAppState() {
+            try {
+                localStorage.setItem(APP_STORAGE_KEY, JSON.stringify({
+                    processes: APP_DATA.processes,
+                    active: APP_DATA.active
+                }));
+            } catch (e) {
+                console.warn('Could not persist app state:', e);
+            }
+        }
+
+        function loadAppState() {
+            try {
+                const saved = localStorage.getItem(APP_STORAGE_KEY);
+                if (!saved) return false;
+                const parsed = JSON.parse(saved);
+                if (parsed?.processes) {
+                    APP_DATA.processes = parsed.processes;
+                }
+                if (parsed?.active) {
+                    APP_DATA.active = parsed.active;
+                }
+                return true;
+            } catch (e) {
+                console.warn('Could not load app state:', e);
+                return false;
+            }
+        }
+
+        function saveHistoryState() {
+            try {
+                localStorage.setItem(HISTORY_STORAGE_KEYS.auditLog, JSON.stringify(auditLog));
+                localStorage.setItem(HISTORY_STORAGE_KEYS.releasedBatches, JSON.stringify([...releasedBatches]));
+            } catch (e) {
+                console.warn('Could not persist history state:', e);
+            }
+        }
+
+        function loadHistoryState() {
+            try {
+                const savedAuditLog = localStorage.getItem(HISTORY_STORAGE_KEYS.auditLog);
+                const savedReleased = localStorage.getItem(HISTORY_STORAGE_KEYS.releasedBatches);
+                if (savedAuditLog) {
+                    auditLog = JSON.parse(savedAuditLog);
+                }
+                if (savedReleased) {
+                    releasedBatches = new Set(JSON.parse(savedReleased));
+                }
+            } catch (e) {
+                console.warn('Could not load history state:', e);
+                auditLog = [];
+                releasedBatches = new Set();
+            }
+        }
 
         function getProcessData(processId) { return APP_DATA.processes[processId] || APP_DATA.processes['banaspati']; }
 
@@ -1869,7 +1949,12 @@
                 }
             }
         }
-        seedDefaultData();
+        if (!loadAppState()) {
+            seedDefaultData();
+        }
+        loadHistoryState();
+        saveHistoryState();
+        saveAppState();
 
         // ============================================================
         // AUTH FUNCTIONS
@@ -2039,6 +2124,31 @@
             updateAllUI();
         };
 
+        function getBatchProcessId(batchId) {
+            for (const procKey of Object.keys(APP_DATA.processes)) {
+                const proc = APP_DATA.processes[procKey];
+                if (proc?.batches?.[batchId]) return procKey;
+            }
+            return null;
+        }
+
+        window.openBatchFromHistory = function(batchId) {
+            if (!batchId) return;
+            const targetProcess = getBatchProcessId(batchId);
+            if (!targetProcess) return;
+            if (APP_DATA.active.process !== targetProcess) {
+                APP_DATA.active.process = targetProcess;
+            }
+            const proc = getActiveProcessData();
+            if (!proc.batches[batchId]) return;
+            APP_DATA.active.batch = batchId;
+            const batch = proc.batches[batchId];
+            APP_DATA.active.material = batch.material || null;
+            APP_DATA.active.product = batch.product || null;
+            updateAllUI();
+            switchMainTab('process');
+        };
+
         window.switchMaterial = function(materialId) {
             if (APP_DATA.active.material === materialId) return;
             const proc = getActiveProcessData();
@@ -2063,7 +2173,6 @@
             const proc = getActiveProcessData();
             const batch = proc.batches[batchId];
             if (action.includes('RELEASED') && batchId) {
-                if (releasedBatches.has(batchId)) return;
                 releasedBatches.add(batchId);
             }
             auditLog.push({
@@ -2076,6 +2185,7 @@
                 details: details || ''
             });
             if (auditLog.length > 200) auditLog.shift();
+            saveHistoryState();
         }
 
         window.confirmAddBatch = function() {
@@ -3054,8 +3164,10 @@
             let h = now.getHours(),
                 ampm = h >= 12 ? 'PM' : 'AM';
             h = h % 12 || 12;
-            document.getElementById('pdf_datetime').textContent =
-                `${pad(now.getDate())}/${pad(now.getMonth()+1)}/${now.getFullYear()} ${pad(h)}:${pad(now.getMinutes())}:${pad(now.getSeconds())} ${ampm}`;
+            document.getElementById('pdf_date').textContent =
+                `${pad(now.getDate())}/${pad(now.getMonth()+1)}/${now.getFullYear()}`;
+            document.getElementById('pdf_time').textContent =
+                `${pad(h)}:${pad(now.getMinutes())}:${pad(now.getSeconds())} ${ampm}`;
 
             const batch = getActiveBatchData();
             const batchId = APP_DATA.active.batch;
@@ -3112,8 +3224,20 @@
                 vBox.className =
                     "text-xs font-mono font-bold text-emerald-700 bg-emerald-50 border border-emerald-300 px-3 py-1.5 rounded-lg inline-block";
                 vBox.textContent = "✓ BATCH RELEASED & FVOM COMPLIANT";
-                if (batchId && !releasedBatches.has(batchId)) {
-                    addAuditEntry(batchId, 'BATCH RELEASED', {});
+                if (batchId) {
+                    const releaseSignature = JSON.stringify({
+                        batchId,
+                        qcData,
+                        dispatch: batch.dispatch || {},
+                        product: batch.product,
+                        material: batch.material,
+                        limits: batch.limits || {}
+                    });
+                    const shouldLogRelease = !batch.lastReleaseSignature || batch.lastReleaseSignature !== releaseSignature;
+                    if (shouldLogRelease) {
+                        batch.lastReleaseSignature = releaseSignature;
+                        addAuditEntry(batchId, 'BATCH RELEASED', {});
+                    }
                 }
             } else if (stages.length === 0) {
                 vBox.className =
@@ -3656,16 +3780,7 @@
         // HISTORY – single release entries only, one date filter
         // ============================================================
         function loadHistory(filters = {}) {
-            let releaseMap = new Map();
-            for (const e of auditLog) {
-                if (e.action && e.action.includes('RELEASED')) {
-                    const key = e.batch_id || e.batch_no || 'unknown';
-                    if (!releaseMap.has(key) || new Date(e.changed_at) > new Date(releaseMap.get(key).changed_at)) {
-                        releaseMap.set(key, e);
-                    }
-                }
-            }
-            let entries = Array.from(releaseMap.values());
+            let entries = auditLog.filter(e => e.action && e.action.includes('RELEASED'));
 
             if (filters.batch_no) {
                 const f = filters.batch_no.toLowerCase();
@@ -3700,7 +3815,7 @@
                 const dayName = d.toLocaleString('en-US', { weekday: 'long' });
                 const batchId = log.batch_id || log.batch_no || '';
                 return `
-                        <tr onclick="switchBatch('${batchId}')">
+                        <tr onclick="openBatchFromHistory('${batchId}')">
                             <td class="p-2 font-medium">${log.batch_no || '—'}</td>
                             <td class="p-2">${log.product_name || '—'}</td>
                             <td class="p-2">${log.action}</td>
@@ -3744,17 +3859,17 @@
                 fname = `COA_${APP_DATA.active.batch || 'BATCH'}.pdf`; }
             const el = document.getElementById(elId);
             if (!el) return;
-            html2pdf().set({ margin: 0.4, filename: `FVOM_${fname}`, image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } }).from(el)
+            html2pdf().set({ margin: 5, filename: `FVOM_${fname}`, image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } }).from(el)
                 .save();
         };
 
         window.downloadCertificatePDF = function() {
             const el = document.getElementById('printableCertificate');
             if (!el) return;
-            html2pdf().set({ margin: 0.3, filename: `FVOM_COA_${APP_DATA.active.batch || 'BATCH'}.pdf`,
-                image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 },
-                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' } }).from(el).save();
+            html2pdf().set({ margin: 5, filename: `FVOM_COA_${APP_DATA.active.batch || 'BATCH'}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } }).from(el).save();
         };
 
         // ============================================================
@@ -3814,6 +3929,7 @@
             const sideId = APP_DATA.active.process === 'banaspati' ? 'side-proc-banapasti' : 'side-proc-oil';
             const sideBtn = document.getElementById(sideId);
             if (sideBtn) sideBtn.classList.add('active-proc');
+            saveAppState();
             lucide.createIcons();
         }
 

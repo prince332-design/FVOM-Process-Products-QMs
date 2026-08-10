@@ -1,1 +1,710 @@
-Chemical Bonding 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 3: Chemical Bonding - Interactive Visual Guide</title>
+    
+    <!-- KaTeX for Math & Chemical Equations -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+    
+    <!-- Three.js for 3D Visualizations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --accent-blue: #38bdf8;
+            --accent-purple: #c084fc;
+            --accent-green: #4ade80;
+            --accent-pink: #f472b6;
+            --text-light: #f8fafc;
+            --text-dim: #94a3b8;
+            --border-color: #334155;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar Navigation */
+        sidebar {
+            width: 320px;
+            background-color: #090d16;
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 1.5rem 1rem;
+            gap: 1rem;
+            overflow-y: auto;
+        }
+
+        sidebar h2 {
+            color: var(--accent-blue);
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-btn {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-dim);
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        .nav-btn:hover, .nav-btn.active {
+            background: var(--bg-card);
+            color: var(--accent-blue);
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+        }
+
+        /* Main Workspace */
+        main {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .section-pane {
+            display: none;
+            flex-direction: column;
+            gap: 1.5rem;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .section-pane.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            color: var(--accent-blue);
+            font-size: 2rem;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        h3 {
+            color: var(--accent-purple);
+            margin-top: 1rem;
+        }
+
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        /* Interactive Canvas Container */
+        .visual-container {
+            width: 100%;
+            height: 380px;
+            background-color: #050811;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Animation Controls */
+        .controls-panel {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            align-items: center;
+        }
+
+        .btn {
+            background: var(--accent-blue);
+            color: #000;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        /* VSEPR Controls */
+        select, input[type="range"] {
+            background: var(--bg-dark);
+            color: var(--text-light);
+            border: 1px solid var(--border-color);
+            padding: 0.5rem;
+            border-radius: 6px;
+            outline: none;
+        }
+
+        /* Table Styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border-color);
+            padding: 0.75rem;
+            text-align: left;
+        }
+
+        th {
+            background-color: #0f172a;
+            color: var(--accent-blue);
+        }
+
+        .info-badge {
+            display: inline-block;
+            background: rgba(192, 132, 252, 0.15);
+            color: var(--accent-purple);
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+
+    <sidebar>
+        <h2>🧪 Chapter 3 Guide</h2>
+        <button class="nav-btn active" onclick="switchTab('tab-intro')">3.1 Introduction & Octet Rule</button>
+        <button class="nav-btn" onclick="switchTab('tab-ionic')">3.2 Ionic & Covalent Bonding</button>
+        <button class="nav-btn" onclick="switchTab('tab-vsepr')">3.3 VSEPR Theory (3D Visual)</button>
+        <button class="nav-btn" onclick="switchTab('tab-vbt')">3.4 Valence Bond Theory (VBT)</button>
+        <button class="nav-btn" onclick="switchTab('tab-hybrid')">3.5 Hybridization (3D)</button>
+        <button class="nav-btn" onclick="switchTab('tab-mot')">3.6 Molecular Orbital Theory</button>
+        <button class="nav-btn" onclick="switchTab('tab-inter')">3.7 Intermolecular Forces</button>
+    </sidebar>
+
+    <main>
+        <!-- SECTION 1: INTRO & OCTET RULE -->
+        <div id="tab-intro" class="section-pane active">
+            <h1>3.1 Introduction & The Octet Rule</h1>
+            <div class="card">
+                <span class="info-badge">Core Concept</span>
+                <p>Atoms combine to achieve chemical stability by attaining an electronic configuration similar to the nearest noble gas (ns<sup>2</sup> np<sup>6</sup> octet or 1s<sup>2</sup> duplet).</p>
+                <br>
+                <h3>Energetics of Chemical Bond Formation</h3>
+                <p>When two atoms approach each other, two types of forces come into play:</p>
+                <ul>
+                    <li><b>Attractive forces:</b> Between the nucleus of one atom and electrons of the other.</li>
+                    <li><b>Repulsive forces:</b> Between electrons of both atoms and nuclei of both atoms.</li>
+                </ul>
+                <p>A stable chemical bond forms when <b>attractive forces outweigh repulsive forces</b>, leading to a minimum potential energy state.</p>
+            </div>
+
+            <div class="card">
+                <h3>Potential Energy Diagram of Bond Formation</h3>
+                <div class="visual-container" id="pe-chart-container">
+                    <canvas id="peCanvas" width="700" height="350"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 2: IONIC & COVALENT BONDING -->
+        <div id="tab-ionic" class="section-pane">
+            <h1>3.2 Ionic & Covalent Bonding</h1>
+            <div class="grid-2">
+                <div class="card">
+                    <span class="info-badge">Ionic Bonding</span>
+                    <p>Formed by complete transfer of one or more electrons from an electropositive atom to an electronegative atom.</p>
+                    <div style="margin-top: 1rem;">
+                        $$\text{Na} (2,8,1) \rightarrow \text{Na}^+ + e^-$$
+                        $$\text{Cl} (2,8,7) + e^- \rightarrow \text{Cl}^-$$
+                        $$\text{Na}^+ + \text{Cl}^- \rightarrow \text{NaCl (Lattice energy released)}$$
+                    </div>
+                </div>
+
+                <div class="card">
+                    <span class="info-badge">Covalent Bonding</span>
+                    <p>Formed by mutual sharing of electron pairs between combining atoms.</p>
+                    <div style="margin-top: 1rem;">
+                        $$\text{Electronegativity Difference } (\Delta EN):$$
+                        <ul>
+                            <li>$\Delta EN = 0$: Pure Covalent (e.g., $H_2, Cl_2$)</li>
+                            <li>$0 < \Delta EN < 1.7$: Polar Covalent (e.g., $HCl$)</li>
+                            <li>$\Delta EN > 1.7$: Ionic Character Dominates</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Coordinate Covalent (Dative) Bond</h3>
+                <p>A covalent bond in which both shared electrons are provided by a single donor atom possessing a lone pair (e.g., formation of Ammonium ion $\text{NH}_4^+$ or Hydronium ion $\text{H}_3\text{O}^+$).</p>
+                <div style="text-align: center; font-size: 1.2rem; margin-top: 1rem;">
+                    $$\text{H}_3\text{N}: + \text{H}^+ \rightarrow [\text{H}_3\text{N} \rightarrow \text{H}]^+$$
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 3: VSEPR THEORY -->
+        <div id="tab-vsepr" class="section-pane">
+            <h1>3.3 Valence Shell Electron Pair Repulsion (VSEPR) Theory</h1>
+            <div class="card">
+                <p>VSEPR predicts the 3D geometry of molecules based on minimizing repulsion between electron pairs surrounding the central atom.</p>
+                <div style="margin-top: 0.5rem; color: var(--accent-pink);">
+                    <b>Repulsion Magnitude:</b> Lone Pair - Lone Pair (lp-lp) > Lone Pair - Bond Pair (lp-bp) > Bond Pair - Bond Pair (bp-bp)
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="controls-panel">
+                    <label><b>Select Geometry Type:</b></label>
+                    <select id="vsepr-select" onchange="updateVSEPR()">
+                        <option value="linear">Linear (AB2) - e.g., BeCl2, CO2</option>
+                        <option value="trigonal">Trigonal Planar (AB3) - e.g., BF3</option>
+                        <option value="tetrahedral">Tetrahedral (AB4) - e.g., CH4</option>
+                        <option value="pyramidal">Trigonal Pyramidal (AB3E) - e.g., NH3</option>
+                        <option value="bent">Bent/V-Shaped (AB2E2) - e.g., H2O</option>
+                    </select>
+                </div>
+
+                <div class="visual-container" id="vsepr-3d-container"></div>
+                <div id="vsepr-details" style="margin-top: 1rem;"></div>
+            </div>
+        </div>
+
+        <!-- SECTION 4: VALENCE BOND THEORY (VBT) -->
+        <div id="tab-vbt" class="section-pane">
+            <h1>3.4 Valence Bond Theory (VBT)</h1>
+            <div class="card">
+                <p>VBT explains covalent bond formation through the overlapping of half-filled atomic orbitals containing electrons with opposite spins.</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Sigma ($\sigma$) Bond</th>
+                            <th>Pi ($\pi$) Bond</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><b>Overlap Mode</b></td>
+                            <td>Head-on / End-to-end along internuclear axis</td>
+                            <td>Sideways / Lateral overlap perpendicular to axis</td>
+                        </tr>
+                        <tr>
+                            <td><b>Orbital Types</b></td>
+                            <td>s-s, s-p, or p-p overlap</td>
+                            <td>p-p overlap only</td>
+                        </tr>
+                        <tr>
+                            <td><b>Strength</b></td>
+                            <td>Stronger (Greater extent of overlap)</td>
+                            <td>Weaker (Lesser extent of overlap)</td>
+                        </tr>
+                        <tr>
+                            <td><b>Rotation</b></td>
+                            <td>Free rotation permitted</td>
+                            <td>Restricted rotation</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- SECTION 5: HYBRIDIZATION -->
+        <div id="tab-hybrid" class="section-pane">
+            <h1>3.5 Orbital Hybridization</h1>
+            <div class="card">
+                <p>Hybridization is the intermixing of atomic orbitals of slightly different energies to produce a new set of equivalent orbitals termed <b>hybrid orbitals</b>.</p>
+            </div>
+
+            <div class="card">
+                <div class="controls-panel">
+                    <label><b>Select Hybridization State:</b></label>
+                    <select id="hybrid-select" onchange="updateHybridization()">
+                        <option value="sp3">sp³ Hybridization (109.5°) - CH4</option>
+                        <option value="sp2">sp² Hybridization (120°) - C2H4</option>
+                        <option value="sp">sp Hybridization (180°) - C2H2</option>
+                    </select>
+                </div>
+                <div class="visual-container" id="hybrid-3d-container"></div>
+            </div>
+        </div>
+
+        <!-- SECTION 6: MOLECULAR ORBITAL THEORY (MOT) -->
+        <div id="tab-mot" class="section-pane">
+            <h1>3.6 Molecular Orbital Theory (MOT)</h1>
+            <div class="card">
+                <p>Atomic orbitals combine linearly (LCAO) to form Molecular Orbitals (MOs):</p>
+                <ul>
+                    <li><b>Bonding MO ($\sigma, \pi$):</b> Lower energy, higher stability, constructive interference.</li>
+                    <li><b>Antibonding MO ($\sigma^*, \pi^*$):</b> Higher energy, lower stability, destructive interference.</li>
+                </ul>
+                <div style="margin-top: 1rem; font-size: 1.1rem;">
+                    $$\text{Bond Order} = \frac{N_b - N_a}{2}$$
+                    <p style="font-size: 0.9rem; color: var(--text-dim);">(Where $N_b$ = Bonding electrons, $N_a$ = Antibonding electrons)</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Energy Level Diagram of O₂ Molecule (Paramagnetism)</h3>
+                <p>MOT uniquely explains why Oxygen ($\text{O}_2$) is <b>paramagnetic</b> due to 2 unpaired electrons in $\pi^*2p_y$ and $\pi^*2p_z$ orbitals.</p>
+                <div class="visual-container" id="mot-diagram-container">
+                    <canvas id="motCanvas" width="700" height="350"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 7: INTERMOLECULAR FORCES -->
+        <div id="tab-inter" class="section-pane">
+            <h1>3.7 Intermolecular Forces (IMFs)</h1>
+            <div class="grid-2">
+                <div class="card">
+                    <h3>1. Dipole-Dipole Forces</h3>
+                    <p>Attraction between permanent dipoles of polar molecules (e.g., $HCl \cdots HCl$).</p>
+                    <br>
+                    <h3>2. Hydrogen Bonding</h3>
+                    <p>An unusually strong dipole-dipole force occurring when Hydrogen is covalently bonded to highly electronegative small atoms: <b>Fluorine, Oxygen, or Nitrogen (F, O, N)</b>.</p>
+                </div>
+
+                <div class="card">
+                    <h3>3. London Dispersion Forces (LDF)</h3>
+                    <p>Temporary attractive forces resulting from instantaneous dipole creation due to unsymmetrical electron distribution. Present in all molecules (polar & non-polar).</p>
+                    <br>
+                    <span class="info-badge">Key Trend</span>
+                    <p>LDF strength increases with larger atomic/molecular size and higher polarizability.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // --- Navigation Switcher ---
+        function switchTab(tabId) {
+            document.querySelectorAll('.section-pane').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+
+            if(tabId === 'tab-vsepr') initVSEPR3D();
+            if(tabId === 'tab-hybrid') initHybrid3D();
+            if(tabId === 'tab-intro') drawPEChart();
+            if(tabId === 'tab-mot') drawMOTDiagram();
+        }
+
+        // --- Render Math Formulas On Load ---
+        window.onload = function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: '$$', right: '$$', display: true},
+                    {left: '$', right: '$', display: false}
+                ]
+            });
+            drawPEChart();
+        };
+
+        // --- Canvas 2D: Potential Energy Curve ---
+        function drawPEChart() {
+            const canvas = document.getElementById('peCanvas');
+            if(!canvas) return;
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Axes
+            ctx.strokeStyle = '#94a3b8';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(60, 20); ctx.lineTo(60, 300); ctx.lineTo(660, 300);
+            ctx.stroke();
+
+            // Axis Labels
+            ctx.fillStyle = '#38bdf8';
+            ctx.font = '14px sans-serif';
+            ctx.fillText("Potential Energy (kJ/mol)", 10, 15);
+            ctx.fillText("Internuclear Distance (r)", 540, 325);
+
+            // Zero Energy Line
+            ctx.strokeStyle = '#334155';
+            ctx.setLineDash([5, 5]);
+            ctx.beginPath();
+            ctx.moveTo(60, 150); ctx.lineTo(660, 150);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Curve
+            ctx.strokeStyle = '#4ade80';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(80, 40);
+            ctx.bezierCurveTo(120, 280, 200, 280, 240, 270);
+            ctx.bezierCurveTo(280, 260, 320, 160, 640, 150);
+            ctx.stroke();
+
+            // Minimum Energy Point Highlight
+            ctx.fillStyle = '#f472b6';
+            ctx.beginPath();
+            ctx.arc(210, 272, 6, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#f8fafc';
+            ctx.fillText("Bond Length (r₀)", 215, 290);
+            ctx.fillText("Bond Energy (-E)", 90, 270);
+        }
+
+        // --- Canvas 2D: MOT Diagram ---
+        function drawMOTDiagram() {
+            const canvas = document.getElementById('motCanvas');
+            if(!canvas) return;
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#38bdf8';
+            ctx.font = '14px sans-serif';
+            ctx.fillText("AO (O Atom 1)", 80, 330);
+            ctx.fillText("Molecular Orbitals (O₂)", 270, 330);
+            ctx.fillText("AO (O Atom 2)", 520, 330);
+
+            // Helper to draw orbital box
+            function drawBox(x, y, label, filled=0) {
+                ctx.strokeStyle = '#c084fc';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(x, y, 30, 30);
+                ctx.fillStyle = '#f8fafc';
+                ctx.font = '10px sans-serif';
+                ctx.fillText(label, x - 5, y + 42);
+
+                // Spin arrows
+                if(filled >= 1) {
+                    ctx.strokeStyle = '#4ade80';
+                    ctx.beginPath(); ctx.moveTo(x+10, y+22); ctx.lineTo(x+10, y+8); ctx.stroke();
+                }
+                if(filled === 2) {
+                    ctx.strokeStyle = '#f472b6';
+                    ctx.beginPath(); ctx.moveTo(x+20, y+8); ctx.lineTo(x+20, y+22); ctx.stroke();
+                }
+            }
+
+            // Draw MO Levels for O2 2p
+            drawBox(100, 180, "2p", 2); drawBox(135, 180, "2p", 1); drawBox(170, 180, "2p", 1);
+            drawBox(500, 180, "2p", 2); drawBox(535, 180, "2p", 1); drawBox(570, 180, "2p", 1);
+
+            // Molecular Orbitals
+            drawBox(335, 260, "σ 2p", 2);
+            drawBox(300, 210, "π 2py", 2); drawBox(370, 210, "π 2pz", 2);
+            drawBox(300, 120, "π* 2py", 1); drawBox(370, 120, "π* 2pz", 1);
+            drawBox(335, 70, "σ* 2p", 0);
+        }
+
+        // --- Three.js 3D Visualizer for VSEPR & Hybridization ---
+        let vseprRenderer, vseprScene, vseprCamera, vseprControls;
+
+        function initVSEPR3D() {
+            const container = document.getElementById('vsepr-3d-container');
+            if (container.children.length > 0) return; // Prevent duplicate renderers
+
+            vseprScene = new THREE.Scene();
+            vseprCamera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+            vseprCamera.position.set(0, 0, 10);
+
+            vseprRenderer = new THREE.WebGLRenderer({ antialias: true });
+            vseprRenderer.setSize(container.clientWidth, container.clientHeight);
+            container.appendChild(vseprRenderer.domElement);
+
+            const light = new THREE.PointLight(0xffffff, 1, 100);
+            light.position.set(10, 10, 10);
+            vseprScene.add(light);
+            vseprScene.add(new THREE.AmbientLight(0x404040));
+
+            vseprControls = new THREE.OrbitControls(vseprCamera, vseprRenderer.domElement);
+            
+            updateVSEPR();
+
+            function animate() {
+                requestAnimationFrame(animate);
+                vseprControls.update();
+                vseprRenderer.render(vseprScene, vseprCamera);
+            }
+            animate();
+        }
+
+        function updateVSEPR() {
+            if(!vseprScene) return;
+
+            // Clear previous objects
+            while(vseprScene.children.length > 0) { 
+                vseprScene.remove(vseprScene.children[0]); 
+            }
+
+            const light = new THREE.PointLight(0xffffff, 1, 100);
+            light.position.set(10, 10, 10);
+            vseprScene.add(light);
+            vseprScene.add(new THREE.AmbientLight(0x404040));
+
+            const type = document.getElementById('vsepr-select').value;
+            const details = document.getElementById('vsepr-details');
+
+            // Central Atom
+            const centerGeo = new THREE.SphereGeometry(0.8, 32, 32);
+            const centerMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8 });
+            const centerMesh = new THREE.Mesh(centerGeo, centerMat);
+            vseprScene.add(centerMesh);
+
+            let positions = [];
+            let detailText = "";
+
+            if(type === 'linear') {
+                positions = [[-3,0,0], [3,0,0]];
+                detailText = "<b>Geometry:</b> Linear | <b>Bond Angle:</b> 180° | <b>Example:</b> BeCl₂";
+            } else if(type === 'trigonal') {
+                positions = [[0,3,0], [-2.6,-1.5,0], [2.6,-1.5,0]];
+                detailText = "<b>Geometry:</b> Trigonal Planar | <b>Bond Angle:</b> 120° | <b>Example:</b> BF₃";
+            } else if(type === 'tetrahedral') {
+                positions = [[0,2.5,0], [-2.3,-1,1.3], [2.3,-1,1.3], [0,-1,-2.5]];
+                detailText = "<b>Geometry:</b> Tetrahedral | <b>Bond Angle:</b> 109.5° | <b>Example:</b> CH₄";
+            } else if(type === 'pyramidal') {
+                positions = [[-2.3,-1,1.3], [2.3,-1,1.3], [0,-1,-2.5]];
+                detailText = "<b>Geometry:</b> Trigonal Pyramidal | <b>Bond Angle:</b> 107.5° | <b>Example:</b> NH₃ (1 Lone Pair)";
+            } else if(type === 'bent') {
+                positions = [[-2,-1,0], [2,-1,0]];
+                detailText = "<b>Geometry:</b> Bent / V-Shaped | <b>Bond Angle:</b> 104.5° | <b>Example:</b> H₂O (2 Lone Pairs)";
+            }
+
+            details.innerHTML = detailText;
+
+            // Outer Atoms & Bonds
+            positions.forEach(pos => {
+                const outerGeo = new THREE.SphereGeometry(0.5, 32, 32);
+                const outerMat = new THREE.MeshStandardMaterial({ color: 0x4ade80 });
+                const outerMesh = new THREE.Mesh(outerGeo, outerMat);
+                outerMesh.position.set(...pos);
+                vseprScene.add(outerMesh);
+
+                // Bond Cylinder
+                const cylinderMat = new THREE.MeshBasicMaterial({ color: 0x94a3b8 });
+                const start = new THREE.Vector3(0,0,0);
+                const end = new THREE.Vector3(...pos);
+                const direction = new THREE.Vector3().subVectors(end, start);
+                const edgeGeometry = new THREE.CylinderGeometry(0.1, 0.1, direction.length(), 8);
+                const edgeMesh = new THREE.Mesh(edgeGeometry, cylinderMat);
+                
+                edgeMesh.position.copy(start.clone().add(end).multiplyScalar(0.5));
+                edgeMesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), direction.clone().normalize());
+                vseprScene.add(edgeMesh);
+            });
+        }
+
+        // --- Three.js 3D Visualizer for Hybridization ---
+        let hybridRenderer, hybridScene, hybridCamera, hybridControls;
+
+        function initHybrid3D() {
+            const container = document.getElementById('hybrid-3d-container');
+            if (container.children.length > 0) return;
+
+            hybridScene = new THREE.Scene();
+            hybridCamera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+            hybridCamera.position.set(0, 0, 12);
+
+            hybridRenderer = new THREE.WebGLRenderer({ antialias: true });
+            hybridRenderer.setSize(container.clientWidth, container.clientHeight);
+            container.appendChild(hybridRenderer.domElement);
+
+            const light = new THREE.PointLight(0xffffff, 1, 100);
+            light.position.set(10, 10, 10);
+            hybridScene.add(light);
+            hybridScene.add(new THREE.AmbientLight(0x404040));
+
+            hybridControls = new THREE.OrbitControls(hybridCamera, hybridRenderer.domElement);
+
+            updateHybridization();
+
+            function animate() {
+                requestAnimationFrame(animate);
+                hybridControls.update();
+                hybridRenderer.render(hybridScene, hybridCamera);
+            }
+            animate();
+        }
+
+        function updateHybridization() {
+            if(!hybridScene) return;
+
+            while(hybridScene.children.length > 0) { 
+                hybridScene.remove(hybridScene.children[0]); 
+            }
+
+            const light = new THREE.PointLight(0xffffff, 1, 100);
+            light.position.set(10, 10, 10);
+            hybridScene.add(light);
+            hybridScene.add(new THREE.AmbientLight(0x404040));
+
+            const type = document.getElementById('hybrid-select').value;
+
+            // Render Lobes
+            function createLobe(rotation) {
+                const group = new THREE.Group();
+                const geo = new THREE.SphereGeometry(1, 32, 32);
+                geo.scale(1, 2.5, 1);
+                const mat = new THREE.MeshStandardMaterial({ color: 0xc084fc, transparent: true, opacity: 0.7 });
+                const mesh = new THREE.Mesh(geo, mat);
+                mesh.position.y = 1.8;
+                group.add(mesh);
+                group.rotation.set(...rotation);
+                return group;
+            }
+
+            if(type === 'sp3') {
+                hybridScene.add(createLobe([0, 0, 0]));
+                hybridScene.add(createLobe([1.91, 0, 0]));
+                hybridScene.add(createLobe([-0.95, 0, 1.65]));
+                hybridScene.add(createLobe([-0.95, 0, -1.65]));
+            } else if(type === 'sp2') {
+                hybridScene.add(createLobe([0, 0, 0]));
+                hybridScene.add(createLobe([0, 0, 2.09]));
+                hybridScene.add(createLobe([0, 0, -2.09]));
+            } else if(type === 'sp') {
+                hybridScene.add(createLobe([0, 0, 1.57]));
+                hybridScene.add(createLobe([0, 0, -1.57]));
+            }
+        }
+    </script>
+</body>
+</html>
